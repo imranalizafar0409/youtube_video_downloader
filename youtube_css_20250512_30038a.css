@@ -1,0 +1,10 @@
+.resolution-option.active {
+  background: #48bb78;
+  color: white;
+  border-left: 4px solid #2f855a;
+}
+
+.resolution-option.active:hover {
+  background: #38a169;
+  transform: none;
+}
