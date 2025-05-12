@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Download YouTube videos in HD quality with multiple resolution options. Fast, free, and user-friendly YouTube video converter">
+    <meta name="keywords" content="YouTube Downloader, Video Converter, HD Video Download, MP4 Downloader, Free YouTube Download">
+    <title>YT Premium Downloader - 4K HD MP3 Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        #videoUrl {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        #videoUrl:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        #resolutionList {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .resolution-option {
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #eee;
+        }
+
+        .resolution-option:hover {
+            background: #f7fafc;
+            transform: translateX(5px);
+        }
+
+        .download-btn {
+            background: #48bb78;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .download-btn:hover {
+            background: #38a169;
+            transform: scale(1.02);
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #48bb78;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .quality-label {
+            display: block;
+            margin: 10px 0;
+            color: #4a5568;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 YouTube Video Downloader</h1>
+        <div class="input-group">
+            <input type="url" id="videoUrl" placeholder="Paste YouTube URL here..." required>
+            <label class="quality-label">Select Quality:</label>
+            <div id="resolutionList">
+                <!-- Resolution options will be dynamically populated -->
+            </div>
+        </div>
+        <button class="download-btn" onclick="handleDownload()">
+            <i class="fas fa-download"></i> Download Video
+        </button>
+        <div class="loader" id="loader"></div>
+    </div>
+
+    <script>
+        document.getElementById('videoUrl').addEventListener('input', async function(e) {
+            const url = e.target.value;
+            if(isValidYouTubeUrl(url)) {
+                showLoader();
+                // Simulated API call - Replace with actual backend integration
+                setTimeout(() => {
+                    populateResolutions([
+                        { quality: '1080p', format: 'MP4' },
+                        { quality: '720p', format: 'MP4' },
+                        { quality: '480p', format: 'MP4' },
+                        { quality: '360p', format: 'MP4' },
+                        { quality: '128kbps', format: 'MP3' }
+                    ]);
+                    hideLoader();
+                }, 1000);
+            }
+        });
+
+        function populateResolutions(resolutions) {
+            const resolutionList = document.getElementById('resolutionList');
+            resolutionList.innerHTML = '';
+            resolutionList.style.display = 'block';
+
+            resolutions.forEach(res => {
+                const div = document.createElement('div');
+                div.className = 'resolution-option';
+                div.innerHTML = `
+                    ${res.quality} ${res.format}
+                    <i class="fas fa-download float-right"></i>
+                `;
+                div.addEventListener('click', () => selectResolution(res));
+                resolutionList.appendChild(div);
+            });
+        }
+
+        function selectResolution(resolution) {
+            document.getElementById('videoUrl').dataset.selectedResolution = resolution.quality;
+            // Add visual feedback for selected resolution
+        }
+
+        function handleDownload() {
+            const url = document.getElementById('videoUrl').value;
+            if(!isValidYouTubeUrl(url)) {
+                alert('Please enter a valid YouTube URL');
+                return;
+            }
+            showLoader();
+            // Add actual download logic here
+            setTimeout(() => {
+                hideLoader();
+                window.location.href = `/download?url=${encodeURIComponent(url)}`;
+            }, 1500);
+        }
+
+        function isValidYouTubeUrl(url) {
+            return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+/.test(url);
+        }
+
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
